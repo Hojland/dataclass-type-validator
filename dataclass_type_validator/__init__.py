@@ -169,13 +169,15 @@ def dataclass_type_validator(target, strict: bool = False, enforce: bool = False
 def pydantic_type_validator(cls, values: dict, strict: bool = False, enforce: bool = False):
     fields = cls.__fields__.values()
     errors = {}
+    new_values = values
     for field in fields:
+        if field.name not in values.keys():
+            continue
         field_name = field.name
         expected_type = field.type_
         value = values[field_name]
-
         err = _validate_types(expected_type=expected_type, value=value, strict=strict)
-        new_values = values
+
         if err is not None:
             errors[field_name] = err
             if enforce:
